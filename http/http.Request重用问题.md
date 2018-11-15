@@ -24,7 +24,7 @@ func main(){
 http: ContentLength=5 with Body length 0
 ```
 原因是第一次请求后req.Body已经读取到结束位置，所以第二次请求时无法再读取body，
-解决方法：重写req的Read(val []byte)方法
+解决方法：重写req.Body的方法
 
 ```go
 package reader
@@ -48,12 +48,14 @@ func (p *Repeat) Read(val []byte) (n int, err error) {
 }
 
 func (p *Repeat) Close() error {
+    // 因为req.Body实现了readcloser接口，所以要实现close方法
+    // 但是repeat中的值有可能是只读的，所以这里只是尝试关闭一下。
 	if p.reader != nil {
     		if rc, ok := p.reader.(io.Closer); ok {
     			return rc.Close()
     		}
     	}
-    	return nil
+	return nil
 }
 
 func doPost()  {
@@ -67,4 +69,4 @@ func doPost()  {
 }
 ```
 
-这样就不会报错了，同时也解决了request重用时，req.Body自动关闭的问题。
+这样就不会报错了，因为也重写了Close()方法，所以同时也解决了request重用时，req.Body自动关闭的问题。
