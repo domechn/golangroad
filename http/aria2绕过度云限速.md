@@ -130,4 +130,6 @@ cd aria2目录
 aria2c.exe --conf-path="./aria2.conf" -D
 ```
 
+服务启动后可访问 [Web UI](http://aria2c.com/)
+
 ![image](../images/aria2/baiduAria2.png)
